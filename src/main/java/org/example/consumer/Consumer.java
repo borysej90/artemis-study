@@ -29,6 +29,7 @@ public class Consumer {
                     System.out.println("Session closed");
                 } catch (ActiveMQException e) {
                     System.out.println("Failed to stop session");
+                    System.out.println(e);
                 }
             }
         });
