@@ -2,36 +2,22 @@ package org.example.consumer;
 
 import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.client.*;
+import org.example.utils.Artemis;
 
 public class Consumer {
     public static void main(String[] args) throws Exception {
+        Artemis artemis = new Artemis("anyq");
+        artemis.registerGracefulShutdown();
 
-        ServerLocator locator = ActiveMQClient.createServerLocator("tcp://localhost:61616");
-        ClientSession session = locator.createSessionFactory().createSession();
-        gracefulShutdown(session);
-
-        ClientConsumer consumer = session.createConsumer("anyq");
-        session.start();
-        while (true) {
+        ClientConsumer consumer = artemis.getSession().createConsumer(artemis.getQueueName());
+        while (!artemis.getSession().isClosed()) {
+            Exception e = consumer.getLastException();
+            if (e != null) {
+                artemis.stop();
+                break;
+            }
             ClientMessage msg = consumer.receive();
             System.out.println("Received \"" + msg.getBodyBuffer().readString() + '"');
         }
-    }
-
-    public static void gracefulShutdown(ClientSession session) {
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try {
-                    session.stop();
-                    System.out.println("Session closed");
-                } catch (ActiveMQException e) {
-                    System.out.println("Failed to stop session");
-                    System.out.println(e);
-                }
-            }
-        });
     }
 }
