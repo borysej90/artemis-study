@@ -14,14 +14,18 @@ public class Artemis {
     private String queueName;
     private ClientSession session;
 
-    public Artemis() throws Exception {
-        ServerLocator locator = ActiveMQClient.createServerLocator("tcp://localhost:61616");
+    public Artemis(String url) throws Exception {
+        ServerLocator locator = ActiveMQClient.createServerLocator(url);
         session = locator.createSessionFactory().createSession();
     }
 
-    public Artemis(String queueName) throws Exception {
-        this();
+    public Artemis(String url, String queueName) throws Exception {
+        this(url);
         this.queueName = queueName;
+    }
+
+    public void startSession() throws ActiveMQException {
+        session.start();
     }
 
     public void stop() throws ActiveMQException {
@@ -32,9 +36,6 @@ public class Artemis {
     }
 
     public void createAnycastQueue(String address, String queueName) throws ActiveMQException {
-        if (session.isClosed()) {
-            session.start();
-        }
         this.queueName = queueName; // FIXME: replaces queueName from second constructor
         queueConfig = new QueueConfiguration(queueName);
         queueConfig.setAddress(address);

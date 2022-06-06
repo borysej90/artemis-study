@@ -6,12 +6,12 @@ import org.example.utils.Artemis;
 
 public class Producer {
     public static void main(String[] args) throws Exception {
-        final String address = "anyq.addr";
-        Artemis artemis = new Artemis();
+        final String address = "client-facing";
+        Artemis artemis = new Artemis("tcp://192.168.56.11:61616");
         artemis.registerGracefulShutdown();
-        artemis.createAnycastQueue(address, "anyq");
 
         ClientProducer producer = artemis.getSession().createProducer(address);
+        artemis.startSession();
         try (ClientSession session = artemis.getSession()) {
             int counter = 0;
             while (!session.isClosed()) {
