@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-core-client</artifactId>
+            <artifactId>artemis-jms-client-all</artifactId>
             <version>2.22.0</version>
         </dependency>
     </dependencies>
